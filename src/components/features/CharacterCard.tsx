@@ -3,9 +3,11 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import type { JSX } from 'react';
 
 import { Card } from '@/components/ui/Card';
+import { saveScrollState } from '@/hooks/useScrollRestoration';
 import type { CharacterSummary } from '@/domain/models/Character';
 
 const STATUS_DOT_CLASSES: Record<CharacterSummary['status'], string> = {
@@ -19,8 +21,15 @@ export interface CharacterCardProps {
 }
 
 export function CharacterCard({ character }: CharacterCardProps): JSX.Element {
+  const searchParams = useSearchParams();
+  const currentPage = Number(searchParams?.get('page')) || 1;
+
+  function handleCardClick(): void {
+    saveScrollState(currentPage);
+  }
+
   return (
-    <Link href={`/character/${character.id}`} className="block">
+    <Link href={`/character/${character.id}`} className="block" onClick={handleCardClick}>
       <motion.div
         whileHover={{ scale: 1.03 }}
         whileTap={{ scale: 0.98 }}
