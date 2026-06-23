@@ -31,7 +31,7 @@ describe('CharacterFilters', () => {
     const user = userEvent.setup();
     render(<CharacterFilters />);
 
-    await user.click(screen.getByRole('button', { name: 'Dead' }));
+    await user.click(screen.getByRole('button', { name: 'Mortos' }));
 
     expect(pushMock).toHaveBeenCalledWith('/?status=Dead', { scroll: false });
   });
@@ -66,7 +66,7 @@ describe('CharacterFilters', () => {
     setSearchParams('status=Dead');
     render(<CharacterFilters />);
 
-    expect(screen.getByRole('button', { name: 'Dead' })).toHaveClass('bg-portal-green');
-    expect(screen.getByRole('button', { name: 'Alive' })).not.toHaveClass('bg-portal-green');
+    expect(screen.getByRole('button', { name: 'Mortos' })).toHaveClass('bg-portal-green');
+    expect(screen.getByRole('button', { name: 'Vivos' })).not.toHaveClass('bg-portal-green');
   });
 });
