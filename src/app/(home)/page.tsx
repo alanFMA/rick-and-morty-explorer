@@ -27,7 +27,9 @@ export default async function HomePage({ searchParams }: HomePageProps): Promise
       <ParallaxSpaceCruiser />
       <section className="mx-auto max-w-6xl px-6 py-12">
         <SlideUp>
-          <h1 className="mb-8 text-2xl font-bold text-foreground">Vitrine de Personagens</h1>
+          <h1 id="character-showcase" className="mb-8 text-2xl font-bold text-foreground">
+            Vitrine de Personagens
+          </h1>
           <CharacterFilters />
           <CharacterGrid characters={results} />
           {results.length > 0 && (
