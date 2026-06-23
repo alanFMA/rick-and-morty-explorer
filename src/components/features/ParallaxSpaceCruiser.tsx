@@ -12,11 +12,11 @@ export function ParallaxSpaceCruiser(): JSX.Element {
     offset: ['start end', 'end start'],
   });
 
-  const x = useTransform(scrollYProgress, [0, 1], ['-20%', '120%']);
-  const y = useTransform(scrollYProgress, [0, 1], ['0%', '40%']);
+  const x = useTransform(scrollYProgress, [0, 1], ['-20%', '700%']);
+  const y = useTransform(scrollYProgress, [0, 1], ['-10%', '100%']);
 
   return (
-    <div ref={ref} className="relative h-32 w-full overflow-hidden">
+    <div ref={ref} className="relative h-36 w-full overflow-hidden">
       <motion.div style={{ x, y }} className="absolute top-0 left-0 w-40">
         <Image
           src="/images/parallax.webp"
