@@ -10,9 +10,9 @@ import { SearchInput } from '@/components/ui/SearchInput';
 
 const STATUS_OPTIONS = [
   { label: 'Todos', value: '' },
-  { label: 'Alive', value: 'Alive' },
-  { label: 'Dead', value: 'Dead' },
-  { label: 'Unknown', value: 'unknown' },
+  { label: 'Vivos', value: 'Alive' },
+  { label: 'Mortos', value: 'Dead' },
+  { label: 'Desconhecido', value: 'unknown' },
 ] as const;
 
 export function CharacterFilters(): JSX.Element {

@@ -10,7 +10,7 @@ test('Jornada de Descoberta: usuário vê personagens e navega para a próxima p
   await expect(firstPageCards.first()).toBeVisible();
   const firstCharacterOnPageOne = await firstPageCards.first().textContent();
 
-  await page.getByRole('link', { name: 'Próxima' }).click();
+  await page.getByRole('button', { name: 'Próxima' }).click();
   await expect(page).toHaveURL(/page=2/);
 
   const firstPageTwoCards = page.locator('a[href^="/character/"]');
