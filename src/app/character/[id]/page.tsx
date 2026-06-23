@@ -1,9 +1,9 @@
 import Image from 'next/image';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { JSX } from 'react';
 
 import { FadeIn } from '@/components/animations/FadeIn';
+import { BackButton } from '@/components/ui/BackButton';
 import { Card } from '@/components/ui/Card';
 import type { CharacterStatus } from '@/domain/models/Character';
 import { fetchCharacterById } from '@/infrastructure/services/characterService';
@@ -31,9 +31,7 @@ export default async function CharacterDetailPage({
   return (
     <section className="mx-auto max-w-4xl px-6 py-12">
       <FadeIn>
-        <Link href="/" className="mb-6 inline-block text-sm text-portal-green hover:underline">
-          ← Voltar para a vitrine
-        </Link>
+        <BackButton href="/" label="Voltar para a vitrine" />
 
         <Card className="overflow-hidden">
           <div className="flex flex-col gap-6 p-6 sm:flex-row">

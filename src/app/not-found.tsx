@@ -1,6 +1,8 @@
-import Link from 'next/link';
+'use client';
+
 import type { JSX } from 'react';
 
+import { BackButton } from '@/components/ui/BackButton';
 import { EmptyState } from '@/components/ui/EmptyState';
 
 export default function NotFound(): JSX.Element {
@@ -10,9 +12,7 @@ export default function NotFound(): JSX.Element {
         title="Personagem não encontrado nesta dimensão."
         description="O personagem que você procura não existe neste universo."
       />
-      <Link href="/" className="text-sm text-portal-green hover:underline">
-        ← Voltar para a vitrine
-      </Link>
+      <BackButton href="/" label="Voltar para a vitrine" />
     </section>
   );
 }
