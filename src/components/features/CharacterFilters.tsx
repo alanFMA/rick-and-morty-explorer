@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type { ChangeEvent, JSX } from 'react';
-import { useEffect, useRef, useState, useTransition } from 'react';
+import { useRef, useState, useTransition } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import { SearchInput } from '@/components/ui/SearchInput';
@@ -21,26 +21,23 @@ export function CharacterFilters(): JSX.Element {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [name, setName] = useState(searchParams.get('name') ?? '');
+  const [status, setStatus] = useState(searchParams.get('status') ?? '');
   const [, startTransition] = useTransition();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // Always points at the latest searchParams, so the debounced callback
-  // below never overwrites a filter applied while it was pending.
-  const searchParamsRef = useRef(searchParams);
-  useEffect(() => {
-    searchParamsRef.current = searchParams;
-  }, [searchParams]);
+  // Mirror name/status outside React state so the debounced callback below
+  // always reads the latest user intent, never a value confirmed by the
+  // (possibly slow) server round-trip of a navigation that's still pending.
+  const nameRef = useRef(name);
+  const statusRef = useRef(status);
 
-  function updateParams(updates: Record<string, string | null>): void {
-    const params = new URLSearchParams(searchParamsRef.current.toString());
-
-    for (const [key, value] of Object.entries(updates)) {
-      if (value) {
-        params.set(key, value);
-      } else {
-        params.delete(key);
-      }
+  function navigate(nextName: string, nextStatus: string): void {
+    const params = new URLSearchParams();
+    if (nextName) {
+      params.set('name', nextName);
     }
-    params.delete('page');
+    if (nextStatus) {
+      params.set('status', nextStatus);
+    }
 
     // Keeps this client component mounted (instead of being torn down by
     // the route's loading.tsx Suspense boundary) so a pending debounced
@@ -53,16 +50,21 @@ export function CharacterFilters(): JSX.Element {
   function handleNameChange(event: ChangeEvent<HTMLInputElement>): void {
     const value = event.target.value;
     setName(value);
+    nameRef.current = value;
 
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
     }
     debounceRef.current = setTimeout(() => {
-      updateParams({ name: value || null });
+      navigate(nameRef.current, statusRef.current);
     }, NAME_DEBOUNCE_MS);
   }
 
-  const currentStatus = searchParams.get('status') ?? '';
+  function handleStatusClick(value: string): void {
+    setStatus(value);
+    statusRef.current = value;
+    navigate(nameRef.current, value);
+  }
 
   return (
     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -79,8 +81,8 @@ export function CharacterFilters(): JSX.Element {
           <Button
             key={option.value}
             type="button"
-            variant={currentStatus === option.value ? 'primary' : 'secondary'}
-            onClick={() => updateParams({ status: option.value || null })}
+            variant={status === option.value ? 'primary' : 'secondary'}
+            onClick={() => handleStatusClick(option.value)}
           >
             {option.label}
           </Button>
