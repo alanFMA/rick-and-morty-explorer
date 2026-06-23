@@ -1,13 +1,12 @@
 'use client';
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import type { ChangeEvent, JSX } from 'react';
-import { useRef, useState, useTransition } from 'react';
+import type { FormEvent, JSX } from 'react';
+import { useState, useTransition } from 'react';
 
 import { Button } from '@/components/ui/Button';
+import { SearchIcon } from '@/components/ui/SearchIcon';
 import { SearchInput } from '@/components/ui/SearchInput';
-
-const NAME_DEBOUNCE_MS = 400;
 
 const STATUS_OPTIONS = [
   { label: 'Todos', value: '' },
@@ -23,12 +22,6 @@ export function CharacterFilters(): JSX.Element {
   const [name, setName] = useState(searchParams.get('name') ?? '');
   const [status, setStatus] = useState(searchParams.get('status') ?? '');
   const [, startTransition] = useTransition();
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // Mirror name/status outside React state so the debounced callback below
-  // always reads the latest user intent, never a value confirmed by the
-  // (possibly slow) server round-trip of a navigation that's still pending.
-  const nameRef = useRef(name);
-  const statusRef = useRef(status);
 
   function navigate(nextName: string, nextStatus: string): void {
     const params = new URLSearchParams();
@@ -39,43 +32,41 @@ export function CharacterFilters(): JSX.Element {
       params.set('status', nextStatus);
     }
 
-    // Keeps this client component mounted (instead of being torn down by
-    // the route's loading.tsx Suspense boundary) so a pending debounced
-    // update never gets lost to a remount triggered by another filter.
     startTransition(() => {
-      router.push(`${pathname}?${params.toString()}`);
+      // scroll: false keeps the user at their current scroll position when the
+      // server re-renders the grid, instead of jumping back to the top.
+      router.push(`${pathname}?${params.toString()}`, { scroll: false });
     });
   }
 
-  function handleNameChange(event: ChangeEvent<HTMLInputElement>): void {
-    const value = event.target.value;
-    setName(value);
-    nameRef.current = value;
-
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current);
-    }
-    debounceRef.current = setTimeout(() => {
-      navigate(nameRef.current, statusRef.current);
-    }, NAME_DEBOUNCE_MS);
+  // Search is intentionally controlled (submit on the magnifying-glass button
+  // or Enter), not fired on every keystroke, so the list isn't re-fetched and
+  // re-rendered mid-typing.
+  function handleSearchSubmit(event: FormEvent<HTMLFormElement>): void {
+    event.preventDefault();
+    navigate(name, status);
   }
 
   function handleStatusClick(value: string): void {
     setStatus(value);
-    statusRef.current = value;
-    navigate(nameRef.current, value);
+    navigate(name, value);
   }
 
   return (
     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <SearchInput
-        id="character-search"
-        label="Buscar personagem por nome"
-        placeholder="Buscar por nome..."
-        value={name}
-        onChange={handleNameChange}
-        className="sm:max-w-xs"
-      />
+      <form onSubmit={handleSearchSubmit} className="flex items-center gap-2">
+        <SearchInput
+          id="character-search"
+          label="Buscar personagem por nome"
+          placeholder="Buscar por nome..."
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          className="sm:max-w-xs"
+        />
+        <Button type="submit" aria-label="Buscar">
+          <SearchIcon className="h-4 w-4" />
+        </Button>
+      </form>
       <div className="flex gap-2">
         {STATUS_OPTIONS.map((option) => (
           <Button

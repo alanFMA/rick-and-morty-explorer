@@ -15,6 +15,18 @@ export function Footer(): JSX.Element {
         </a>
         .
       </p>
+      <p>
+        Desenvolvido por{' '}
+        <a
+          href="https://alanfma.vercel.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-medium text-portal-green hover:underline"
+        >
+          Alan Andrade
+        </a>
+        .
+      </p>
     </footer>
   );
 }

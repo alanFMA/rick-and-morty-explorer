@@ -21,8 +21,6 @@ vi.mock('next/navigation', () => ({
   useSearchParams: (): URLSearchParams => getSearchParams(),
 }));
 
-const NAME_DEBOUNCE_WAIT_MS = 500;
-
 beforeEach(() => {
   pushMock.mockClear();
   setSearchParams('');
@@ -35,20 +33,33 @@ describe('CharacterFilters', () => {
 
     await user.click(screen.getByRole('button', { name: 'Dead' }));
 
-    expect(pushMock).toHaveBeenCalledWith('/?status=Dead');
+    expect(pushMock).toHaveBeenCalledWith('/?status=Dead', { scroll: false });
   });
 
-  it('navigates with the debounced name filter after typing', async () => {
+  it('navigates with the name filter only when the search button is clicked', async () => {
     const user = userEvent.setup();
     render(<CharacterFilters />);
 
-    await user.type(screen.getByLabelText('Buscar personagem por nome'), 'Rick');
+    const searchInput = screen.getByLabelText('Buscar personagem por nome');
+    await user.type(searchInput, 'Rick');
 
+    // Typing alone does not trigger a navigation
     expect(pushMock).not.toHaveBeenCalled();
 
-    await new Promise((resolve) => setTimeout(resolve, NAME_DEBOUNCE_WAIT_MS));
+    // Clicking the search button triggers it
+    await user.click(screen.getByRole('button', { name: 'Buscar' }));
 
-    expect(pushMock).toHaveBeenCalledWith('/?name=Rick');
+    expect(pushMock).toHaveBeenCalledWith('/?name=Rick', { scroll: false });
+  });
+
+  it('navigates when Enter is pressed in the search input', async () => {
+    const user = userEvent.setup();
+    render(<CharacterFilters />);
+
+    const searchInput = screen.getByLabelText('Buscar personagem por nome');
+    await user.type(searchInput, 'Morty{Enter}');
+
+    expect(pushMock).toHaveBeenCalledWith('/?name=Morty', { scroll: false });
   });
 
   it('highlights the status button matching the current URL', () => {
